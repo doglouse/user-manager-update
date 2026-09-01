@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRIME Admin 3 — User Manager</title>
+
+<!-- Fonts actually used: Roboto (chrome, labels, tables), Inter (modal titles), Roboto Flex (values/badges, local file) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;600;700&display=swap">
+<!-- Icons: Material Design Icons 7.4.47 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+
+<style>
+/* ============================================================
+   PrimeAdmin 3 design system — tokens & type
+   ============================================================ */
+/* ============================================================
+   PrimeAdmin 3 — Colors & Type
+   Material-style admin design system.
+   v2 (Aug 2026): squared buttons, trimmed palette, caps heading
+   ladder, softened elevation. Reconciled against the Activity
+   Details redesign, the Admin 3 Pattern Library, and the
+   Newsletters build.
+   ============================================================ */
+
+
+@font-face {
+  font-family: "Roboto Flex";
+  src: url("RobotoFlex-Variable.ttf") format("truetype-variations");
+  font-weight: 100 1000;
+  font-stretch: 25% 151%;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- Interactive blue -------------------------------
+     One accent per action class. Blue is anything that changes
+     data; aqua is reserved for links that leave the page. */
+  --pa-primary:        rgb(25, 118, 210);
+  --pa-primary-700:    rgb(17,  71, 161);  /* active tab, pressed, link hover */
+  --pa-primary-050:    rgb(238, 245, 252); /* inline sub-panels, row hover */
+  --pa-primary-12a:    rgba(25, 118, 210, 0.12); /* selected chip / tag fill */
+  --pa-primary-04a:    rgba(25, 118, 210, 0.04); /* hover film */
+
+  /* ---------- Aqua — external-link buttons only -------------- */
+  --pa-aqua-500:       rgb(  0, 173, 238);
+
+  /* ---------- Ink -------------------------------------------- */
+  --pa-ink:            rgb( 33,  33,  33); /* headings, body */
+  --pa-ink-2:          rgb( 66,  66,  66); /* icon default, rule copy */
+  --pa-ink-3:          rgb(102, 102, 102); /* field labels, helper text */
+  --pa-ink-4:          rgb(113, 113, 113); /* meta values, secondary rows */
+  --pa-ink-6:          rgb(137, 147, 158); /* placeholder, empty value */
+  --pa-ink-7:          rgb(158, 158, 158); /* disabled border, empty glyph */
+
+  /* ---------- Surfaces --------------------------------------- */
+  --pa-paper:          rgb(255, 255, 255);
+  --pa-band:           rgb(240, 240, 240); /* section band — the only
+                                              non-white content surface */
+  --pa-line:           rgb(238, 238, 238); /* hairline */
+  --pa-line-2:         rgb(224, 224, 224); /* unselected chip */
+  --pa-divider:        rgba(0, 0, 0, 0.12); /* card + modal borders */
+  --pa-rule:           rgba(0, 0, 0, 0.60); /* list-table head rule */
+  --pa-sidebar-bg:     rgb( 32,  32,  32);
+  --pa-sidebar-active: rgb( 62,  62,  62);
+  --pa-avatar-green:   rgb( 76, 175,  80); /* signed-in user, header only */
+
+  /* ---------- Field chrome -----------------------------------
+     Record fields focus to black, not blue: the underline is
+     structure, not an action. */
+  --pa-field-line:     rgba(0, 0, 0, 0.42);
+  --pa-field-focus:    rgb(0, 0, 0);
+
+  /* ---------- Semantic — status text, toasts, validation ------ */
+  --pa-success:        rgb( 46, 125,  50);
+  --pa-success-bg:     rgb(232, 245, 233);
+  --pa-warning:        rgb(233, 143,  40);
+  --pa-warning-bg:     rgb(255, 244, 229);
+  --pa-error:          rgb(211,  47,  47);
+  --pa-error-bg:       rgb(253, 237, 237);
+
+  /* ---------- Type stack ------------------------------------- */
+  --pa-font-sans:       "Roboto", system-ui, sans-serif;
+  --pa-font-display:    "Roboto Flex", "Roboto", system-ui, sans-serif;
+  --pa-font-modal:      "Inter", "Roboto", system-ui, sans-serif;
+
+  /* ---------- Radii ------------------------------------------
+     Buttons are squared. The 16px pill is reserved for chips,
+     role badges, and status pills. */
+  --pa-radius-xs:    2px;   /* table cells */
+  --pa-radius-sm:    4px;   /* cards, buttons, fields, search */
+  --pa-radius-lg:    8px;   /* modals, panels, dropzone */
+  --pa-radius-pill: 16px;   /* chips, badges */
+
+  /* ---------- Elevation -------------------------------------- */
+  --pa-elev-1: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 1px -1px rgba(0,0,0,0.05);
+  --pa-elev-2: 0 1px 5px 0 rgba(0,0,0,0.12),
+               0 2px 2px 0 rgba(0,0,0,0.14),
+               0 3px 1px -2px rgba(0,0,0,0.20);                  /* buttons */
+  --pa-elev-card: 0 10px 13px -5px rgba(0,0,0,0.05),
+                  0 4px 5px -6px rgba(0,0,0,0.05);               /* form cards */
+  --pa-elev-raised: 0 20px 25px -5px rgba(0,0,0,0.10),
+                    0 8px 10px -6px rgba(0,0,0,0.10);            /* faculty card, toast */
+  --pa-elev-modal: 0 9px 46px 8px rgba(0,0,0,0.12),
+                   0 24px 38px 3px rgba(0,0,0,0.14),
+                   0 11px 15px -7px rgba(0,0,0,0.20);            /* modals, drawers */
+
+  /* ---------- Spacing ---------------------------------------- */
+  --pa-s-1:  4px;
+  --pa-s-2:  8px;
+  --pa-s-3: 12px;
+  --pa-s-4: 16px;
+  --pa-s-5: 20px;
+  --pa-s-6: 24px;   /* between stacked fields, between cards */
+  --pa-s-8: 32px;   /* page gutter, card padding */
+  --pa-s-10: 40px;  /* between paired columns */
+  --pa-s-15: 60px;
+}
+
+/* ============================================================
+   Heading ladder — all caps, Roboto Regular, one role per level
+   ============================================================ */
+
+/* Page title. One per page. */
+.pa-page-title {
+  font-family: var(--pa-font-sans);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 34px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--pa-primary);
+  margin: 0;
+}
+
+/* Screen heading — names the record, carries its code in parens. */
+.pa-screen-title {
+  font-family: var(--pa-font-sans);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 30px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  margin: 0;
+}
+
+/* Card section band title — sits on --pa-band. */
+.pa-band-title {
+  font-family: var(--pa-font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  margin: 0;
+}
+
+/* Rail heading — groups right-hand utility stacks. */
+.pa-rail-title {
+  font-family: var(--pa-font-sans);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 26px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  margin: 0;
+}
+
+/* Modal / drawer title — Inter, the only place it appears. */
+.pa-modal-title {
+  font-family: var(--pa-font-modal);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 26px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  margin: 0;
+}
+
+/* ============================================================
+   Body, meta, and control type
+   ============================================================ */
+
+.pa-body-16 { font-family: var(--pa-font-display); font-size: 16px; line-height: 24px; letter-spacing: 0.1px; color: var(--pa-ink); }
+.pa-body-14 { font-family: var(--pa-font-sans); font-size: 14px; line-height: 20px; color: var(--pa-ink); }
+.pa-body-13 { font-family: var(--pa-font-sans); font-size: 13.5px; line-height: 20px; color: var(--pa-ink); }
+.pa-body-12 { font-family: var(--pa-font-sans); font-size: 12px; line-height: 18px; color: var(--pa-ink); }
+
+/* Helper text. Belongs to the field it explains, never the group. */
+.pa-helper { font-family: var(--pa-font-sans); font-size: 12px; line-height: 18px; color: var(--pa-ink-3); }
+
+/* Meta strip under a page title: key in caps, value in medium. */
+.pa-meta { display: flex; flex-wrap: wrap; gap: 6px 30px; font-family: var(--pa-font-sans); font-size: 13px; }
+.pa-meta-key { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--pa-ink-3); }
+.pa-meta-val { font-weight: 500; color: var(--pa-ink); }
+.pa-meta-val--success { color: var(--pa-success); font-weight: 500; }
+.pa-meta-val--warning { color: var(--pa-warning); font-weight: 500; }
+.pa-meta-val--error   { color: var(--pa-error);   font-weight: 500; }
+
+/* Field label at rest, and once floated above the underline. */
+.pa-field-label { font-family: var(--pa-font-sans); font-size: 13px; line-height: 19px; color: var(--pa-ink-3); }
+.pa-field-label--float { font-size: 11.5px; line-height: 16px; color: var(--pa-ink-3); }
+
+/* Value inside a field. */
+.pa-input-text { font-family: var(--pa-font-display); font-size: 13.5px; line-height: 20px; color: var(--pa-ink); }
+
+.pa-button-text { font-family: var(--pa-font-sans); font-weight: 500; font-size: 12px; line-height: 100%; text-transform: uppercase; }
+.pa-button-text-sm { font-family: var(--pa-font-display); font-weight: 700; font-size: 10.8px; line-height: 16.2px; text-transform: uppercase; }
+.pa-chip-text { font-family: var(--pa-font-display); font-weight: 700; font-size: 10.5px; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.pa-caption { font-family: var(--pa-font-sans); font-size: 11.5px; line-height: 16px; color: var(--pa-ink-3); }
+
+/* Section eyebrow inside rule callouts and sub-panels. */
+.pa-eyebrow {
+  font-family: var(--pa-font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pa-primary);
+}
+
+
+/* ============================================================
+   PrimeAdmin 3 design system — components & patterns
+   ============================================================ */
+/* PrimeAdmin 3 — component styles for preview cards, templates, and
+   the UI kit. Tokens come from ../colors_and_type.css.
+   v2 (Aug 2026): squared buttons, 4px cards, section bands, grid +
+   list tables, app chrome, empty states. */
+@import url("../colors_and_type.css");
+
+/* ================= Buttons =====================================
+   Squared to 4px. Label always all caps. One primary per region. */
+.pa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--pa-radius-sm);
+  border: none;
+  font-family: var(--pa-font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  isolation: isolate;
+  transition: background 150ms cubic-bezier(.4,0,.2,1), box-shadow 150ms cubic-bezier(.4,0,.2,1);
+}
+.pa-btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: transparent; pointer-events: none; z-index: 1; }
+.pa-btn > * { position: relative; z-index: 2; }
+.pa-btn--sm { height: 24px; padding: 0 12px; font-size: 10.8px; }
+.pa-btn--lg { height: 40px; padding: 0 20px; }
+.pa-btn--block { width: 100%; }
+/* Escape hatch: row-level add/remove buttons inside picker drawers. */
+.pa-btn--pill { border-radius: var(--pa-radius-pill); }
+
+.pa-btn--primary { background: var(--pa-primary); color: #fff; box-shadow: var(--pa-elev-2); }
+.pa-btn--primary:hover::after  { background: rgba(255,255,255,0.08); }
+.pa-btn--primary:active::after { background: rgba(0,0,0,0.24); }
+
+.pa-btn--secondary { background: #fff; color: var(--pa-primary); border: 1px solid var(--pa-primary); }
+.pa-btn--secondary:hover::after  { background: var(--pa-primary-04a); }
+.pa-btn--secondary:active::after { background: rgba(25,118,210,0.24); }
+
+.pa-btn--secondary-grey { background: #fff; color: var(--pa-ink-2); border: 1px solid var(--pa-ink-7); }
+.pa-btn--secondary-grey:hover::after  { background: rgba(33,33,33,0.04); }
+.pa-btn--secondary-grey:active::after { background: rgba(33,33,33,0.24); }
+
+.pa-btn--tertiary { background: transparent; color: var(--pa-primary); }
+.pa-btn--tertiary:hover::after  { background: var(--pa-primary-04a); }
+.pa-btn--tertiary:active::after { background: rgba(25,118,210,0.24); }
+
+.pa-btn--tertiary-grey { background: transparent; color: var(--pa-ink-2); }
+.pa-btn--tertiary-grey:hover::after  { background: rgba(33,33,33,0.04); }
+.pa-btn--tertiary-grey:active::after { background: rgba(33,33,33,0.24); }
+
+/* Destructive: outline for in-page removals, solid only in a confirm dialog. */
+.pa-btn--danger-outline { background: #fff; color: var(--pa-error); border: 1px solid var(--pa-error); }
+.pa-btn--danger-outline:hover::after { background: rgba(211,47,47,0.06); }
+.pa-btn--danger { background: var(--pa-error); color: #fff; box-shadow: var(--pa-elev-2); }
+.pa-btn--danger:hover::after { background: rgba(255,255,255,0.08); }
+
+.pa-btn[disabled] { opacity: 0.3; pointer-events: none; box-shadow: none; }
+a.pa-btn, a.pa-btn:hover { text-decoration: none; }
+a.pa-btn--primary, a.pa-btn--primary:hover, a.pa-btn--danger, a.pa-btn--danger:hover { color: #fff; }
+a.pa-btn--secondary-grey, a.pa-btn--secondary-grey:hover { color: var(--pa-ink-2); }
+
+/* Rail link button — aqua, full width, left aligned, open-in-new.
+   Only for destinations outside the current page. */
+.pa-btn-rail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--pa-aqua-500);
+  color: #fff;
+  border: none;
+  border-radius: var(--pa-radius-sm);
+  padding: 11px 14px;
+  font-family: var(--pa-font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--pa-elev-2);
+}
+.pa-btn-rail:hover { filter: brightness(1.06); }
+.pa-btn-rail i { font-size: 16px; }
+
+/* Icon button — 36px circular target, 6% ink film on hover. Always titled. */
+.pa-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pa-ink-2);
+  transition: background 150ms cubic-bezier(.4,0,.2,1);
+}
+.pa-icon-btn i { font-size: 19px; }
+.pa-icon-btn:hover { background: rgba(33,33,33,0.06); }
+.pa-icon-btn--sm { width: 32px; height: 32px; }
+.pa-icon-btn--primary { color: var(--pa-primary); }
+.pa-icon-btn--primary:hover { background: var(--pa-primary-04a); }
+.pa-icon-btn--danger { color: var(--pa-error); }
+.pa-icon-btn--danger:hover { background: rgba(211,47,47,0.08); }
+
+/* ================= Chips, badges, pills ======================== */
+.pa-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--pa-radius-pill);
+  font-family: var(--pa-font-display);
+  font-weight: 700;
+  font-size: 10.8px;
+  line-height: 16.2px;
+  text-transform: uppercase;
+  background: var(--pa-line-2);
+  color: var(--pa-ink);
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  isolation: isolate;
+}
+.pa-chip::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.pa-chip > * { position: relative; z-index: 2; }
+.pa-chip--selected { background: var(--pa-primary-12a); color: var(--pa-primary); }
+.pa-chip:hover.pa-chip--selected::after { background: var(--pa-primary-04a); }
+.pa-chip:hover:not(.pa-chip--selected)::after { background: rgba(33,33,33,0.04); }
+.pa-chip[disabled] { opacity: 0.3; pointer-events: none; }
+
+/* Role badge — solid blue pill, not interactive. */
+.pa-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--pa-radius-pill);
+  background: var(--pa-primary);
+  color: #fff;
+  font-family: var(--pa-font-display);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+/* Count / tag pill — 12% tint. */
+.pa-badge--tint { background: var(--pa-primary-12a); color: var(--pa-primary); padding: 4px 11px; font-size: 10px; }
+.pa-badge--success { background: var(--pa-success); }
+
+/* Document status pill — outline, icon leads. */
+.doc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--pa-radius-pill);
+  border: 1px solid var(--pa-line-2);
+  font-family: var(--pa-font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--pa-ink-3);
+  background: #fff;
+}
+.doc-pill--ok   { border-color: rgba(46,125,50,0.5);  color: var(--pa-success); background: var(--pa-success-bg); }
+.doc-pill--warn { border-color: rgba(233,143,40,0.5); color: var(--pa-warning); background: var(--pa-warning-bg); }
+.doc-pill--err  { border-color: rgba(211,47,47,0.5);  color: var(--pa-error);   background: var(--pa-error-bg); }
+
+/* Status dot + label — status is coloured text, never a filled badge. */
+.pa-status { display: inline-flex; align-items: center; gap: 7px; font-family: var(--pa-font-sans); font-size: 12.5px; }
+.pa-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+.pa-status--on  { color: var(--pa-success); }
+.pa-status--off { color: var(--pa-ink-4); }
+
+/* Avatars — initials on primary-050. Green is the signed-in user only. */
+.pa-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--pa-primary-050);
+  color: var(--pa-primary);
+  font-family: var(--pa-font-display);
+  font-weight: 600;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.pa-avatar--overflow { background: var(--pa-line-2); color: var(--pa-ink-3); font-family: var(--pa-font-sans); font-size: 11px; }
+.pa-avatar--lg { width: 78px; height: 78px; font-size: 24px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--pa-avatar-green); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--pa-font-sans); font-weight: 500; font-size: 12px; flex: 0 0 auto; }
+
+/* ================= Fields ======================================
+   Floating label: on the baseline when empty, rising 24px and
+   scaling to 11.5px once focused or filled. Focus is black —
+   the underline is structure, not an action. `.vf` in
+   _vuetify-inputs.css is the interactive Vuetify-accurate build;
+   `.pa-field` is the static documentation form of the same thing. */
+.pa-field { position: relative; padding-top: 18px; width: 100%; font-family: var(--pa-font-sans); }
+.pa-field__label {
+  position: absolute;
+  left: 0; top: 18px;
+  padding: 6px 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--pa-ink-3);
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 150ms cubic-bezier(.4,0,.2,1), color 150ms cubic-bezier(.4,0,.2,1);
+}
+.pa-field:where(:focus-within) > .pa-field__label,
+.pa-field:where(:has(.pa-field__input:not(:placeholder-shown))) > .pa-field__label,
+.pa-field:where(:has(> div:not(.pa-field__hint))) > .pa-field__label,
+.pa-field--filled > .pa-field__label { transform: translateY(-24px) scale(0.885); }
+.pa-field:focus-within > .pa-field__label { color: var(--pa-field-focus); }
+.pa-field__input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 1px solid var(--pa-field-line);
+  padding: 6px 0;
+  font-family: var(--pa-font-display);
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--pa-ink);
+  background: transparent;
+  outline: none;
+  transition: border-color 150ms cubic-bezier(.4,0,.2,1);
+}
+.pa-field__input::placeholder { color: transparent; }
+.pa-field__input:focus { border-bottom: 2px solid var(--pa-field-focus); padding-bottom: 5px; caret-color: var(--pa-field-focus); }
+/* Boxed search and filter inputs may show a real placeholder. */
+.pa-field--hasplaceholder .pa-field__input::placeholder { color: var(--pa-ink-6); }
+.pa-field--error .pa-field__input { border-bottom-color: var(--pa-error); }
+.pa-field--error > .pa-field__label, .pa-field--error:focus-within > .pa-field__label { color: var(--pa-error); }
+.pa-field--error .pa-field__hint { color: var(--pa-error); }
+/* Read-only keeps the underline but switches it to dashed. */
+.pa-field--disabled .pa-field__input { border-bottom-style: dashed; color: var(--pa-ink-7); }
+.pa-field__hint { font-size: 12px; line-height: 18px; color: var(--pa-ink-3); padding-top: 6px; }
+/* Trailing affordance row (select chevron, date, time, chips). */
+.pa-field__control { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--pa-field-line); padding: 6px 0; }
+.pa-field__control i { font-size: 19px; color: var(--pa-ink-2); }
+.pa-field__value { flex: 1; font-family: var(--pa-font-display); font-size: 13.5px; color: var(--pa-ink); }
+.pa-field__value--empty { color: var(--pa-ink-6); }
+
+/* Boxed search — search and table filters only. */
+.search { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: #fff; border: 1px solid var(--pa-divider); border-radius: var(--pa-radius-sm); width: 280px; box-sizing: border-box; }
+.search input { border: none; outline: none; background: transparent; font-family: var(--pa-font-display); font-size: 13px; flex: 1; min-width: 0; color: var(--pa-ink); }
+.search input::placeholder { color: var(--pa-ink-6); }
+
+/* ================= Surfaces ==================================== */
+.pa-card { background: #fff; border: 1px solid var(--pa-divider); border-radius: var(--pa-radius-sm); box-shadow: var(--pa-elev-1); }
+.pa-card--form { box-shadow: var(--pa-elev-card); }
+.pa-card--raised { box-shadow: var(--pa-elev-raised); }
+
+/* Section band — divides one card into labelled groups.
+   Related groups become bands inside a card, never new cards. */
+.pa-band {
+  background: var(--pa-band);
+  padding: 13px 32px;
+  font-family: var(--pa-font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pa-band--sm { padding: 12px 16px; font-size: 16px; }
+.pa-card__body { padding: 26px 32px 28px; display: flex; flex-direction: column; gap: 24px; }
+
+/* Inline sub-panel — primary-050, opens directly under its trigger. */
+.pa-subpanel { background: var(--pa-primary-050); border-top: 1px solid var(--pa-line); padding: 16px; }
+
+/* Rule callout — the documentation voice, also used for inline guidance. */
+.pa-rules { background: var(--pa-primary-050); border-radius: var(--pa-radius-sm); padding: 16px 18px; }
+.pa-rules ul { margin: 8px 0 0; padding-left: 18px; font-family: var(--pa-font-sans); font-size: 12.5px; line-height: 19px; color: var(--pa-ink-2); }
+
+/* Dropzone — the only dashed border in the product. */
+.pa-dropzone { border: 2px dashed var(--pa-primary); border-radius: var(--pa-radius-lg); padding: 34px 20px; text-align: center; background: #fff; font-family: var(--pa-font-sans); font-size: 13.5px; }
+.pa-dropzone__hint { font-size: 12.5px; color: var(--pa-ink-3); margin-top: 5px; }
+.pa-file-row { display: flex; align-items: center; gap: 12px; border: 1px solid var(--pa-primary); border-radius: var(--pa-radius-sm); padding: 10px 14px; font-family: var(--pa-font-sans); }
+
+/* Empty / not-migrated state. */
+.pa-empty { border: 1px solid var(--pa-line); border-radius: var(--pa-radius-sm); display: flex; flex-direction: column; align-items: center; padding: 40px 24px; text-align: center; font-family: var(--pa-font-sans); }
+.pa-empty i { font-size: 48px; color: var(--pa-ink-7); }
+.pa-empty__title { font-size: 18px; margin-top: 14px; color: var(--pa-ink); }
+.pa-empty__body { font-size: 13.5px; line-height: 20px; color: var(--pa-ink-3); margin-top: 6px; max-width: 360px; }
+
+/* ================= Tables ======================================
+   Grid table for a bounded set inside a record — never paginated.
+   List table for open-ended index screens. */
+.pa-table { border: 1px solid var(--pa-divider); border-radius: var(--pa-radius-sm); overflow: hidden; font-family: var(--pa-font-sans); }
+.pa-table__head, .pa-table__row { display: grid; align-items: center; }
+.pa-table__head { background: var(--pa-band); font-size: 12px; font-weight: 500; color: var(--pa-ink); }
+.pa-table__head > * { padding: 11px 16px; border-right: 1px solid var(--pa-divider); }
+.pa-table__head > *:last-child { border-right: none; }
+.pa-table__row { border-top: 1px solid var(--pa-line); font-size: 13px; }
+.pa-table__row > * { padding: 12px 16px; border-right: 1px solid var(--pa-line); }
+.pa-table__row > *:last-child { border-right: none; }
+.pa-table__row:hover { background: var(--pa-primary-04a); }
+
+.pa-ltable { width: 100%; border-collapse: collapse; font-family: var(--pa-font-sans); }
+.pa-ltable th { padding: 14px; text-align: left; font-size: 14px; font-weight: 400; color: var(--pa-ink); white-space: nowrap; border-top: 1px solid var(--pa-rule); border-bottom: 1px solid var(--pa-rule); }
+.pa-ltable th.sortable { cursor: pointer; user-select: none; }
+.pa-ltable td { padding: 14px; font-size: 13.5px; color: var(--pa-ink); border-bottom: 1px solid var(--pa-line); vertical-align: top; }
+.pa-ltable tbody tr:hover { background: rgba(33,33,33,0.02); }
+.pa-ltable .num { color: var(--pa-ink-2); }
+.pa-ltable .desc { font-size: 12.5px; line-height: 18px; color: var(--pa-ink-2); text-wrap: pretty; }
+.pa-ltable .acts { text-align: right; white-space: nowrap; }
+
+/* Table controls — repeat above and below a list table. */
+.pa-tablebar { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 6px 0 10px; font-family: var(--pa-font-sans); font-size: 13px; color: var(--pa-ink-2); }
+.pa-tablebar--footer { padding: 12px 0 0; border-top: 1px solid var(--pa-rule); }
+.pa-tablebar select { height: 34px; border: 1px solid var(--pa-line); border-radius: var(--pa-radius-sm); background: #fff; font-family: var(--pa-font-sans); font-size: 13px; color: var(--pa-ink); padding: 0 8px; }
+.pa-pager { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.pa-pager button { min-width: 30px; height: 30px; padding: 0 6px; border: none; border-radius: var(--pa-radius-sm); background: transparent; font-family: var(--pa-font-sans); font-size: 13px; color: var(--pa-ink-2); cursor: pointer; }
+.pa-pager button:hover { background: rgba(33,33,33,0.06); }
+.pa-pager button[aria-current="page"] { background: var(--pa-primary-12a); color: var(--pa-primary); font-weight: 500; }
+.pa-pager button[disabled] { opacity: 0.3; pointer-events: none; }
+
+/* ================= Toast ======================================= */
+.pa-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--pa-radius-sm);
+  font-family: var(--pa-font-sans);
+  font-size: 14px;
+  color: var(--pa-ink);
+  background: #fff;
+  border-left: 4px solid var(--pa-primary);
+  box-shadow: var(--pa-elev-raised);
+}
+.pa-toast--success { border-left-color: var(--pa-success); }
+.pa-toast--warning { border-left-color: var(--pa-warning); }
+.pa-toast--error   { border-left-color: var(--pa-error); }
+.pa-toast__icon { font-size: 20px; display: inline-flex; }
+.pa-toast--success .pa-toast__icon { color: var(--pa-success); }
+.pa-toast--warning .pa-toast__icon { color: var(--pa-warning); }
+.pa-toast--error   .pa-toast__icon { color: var(--pa-error); }
+.pa-toast--info    .pa-toast__icon { color: var(--pa-primary); }
+
+/* ================= App chrome ================================== */
+.topbar { height: 56px; background: #fff; border-bottom: 1px solid var(--pa-divider); display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+.topbar__btn { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--pa-ink-2); cursor: pointer; border: none; background: transparent; }
+.topbar__btn:hover { background: rgba(0,0,0,0.04); }
+
+.sb { width: 230px; flex-shrink: 0; background: var(--pa-sidebar-bg); color: #fff; font-family: var(--pa-font-sans); display: flex; flex-direction: column; }
+.sb__head { padding: 18px 14px; display: flex; align-items: center; justify-content: space-between; }
+.sb__brand { font-weight: 500; font-size: 19px; letter-spacing: 1px; color: #fff; }
+.sb__brand span { color: var(--pa-aqua-500); }
+.sb__collapse { color: rgba(255,255,255,0.6); cursor: pointer; }
+.sb__section { padding: 4px 0; }
+.sb__item { display: flex; align-items: center; gap: 14px; padding: 12px 18px; font-size: 14px; color: rgba(255,255,255,0.9); cursor: pointer; user-select: none; }
+.sb__item i { font-size: 20px; }
+.sb__item__chev { margin-left: auto; font-size: 18px; opacity: 0.6; }
+.sb__item--active { background: var(--pa-sidebar-active); }
+.sb__item:hover:not(.sb__item--active) { background: rgba(255,255,255,0.06); }
+.sb__sub { padding: 2px 0 8px; }
+.sb__sub-item { display: flex; padding: 8px 18px 8px 54px; font-size: 13px; color: rgba(255,255,255,0.72); cursor: pointer; }
+.sb__sub-item--active { background: var(--pa-sidebar-active); color: #fff; }
+.sb__sub-item:hover:not(.sb__sub-item--active) { color: #fff; }
+
+/* Tab bar — full-width primary blue, equal-width tabs, no underline. */
+.pa-tabs { display: flex; align-items: stretch; height: 48px; background: var(--pa-primary); color: #fff; }
+.pa-tabs--sm { height: 44px; }
+.pa-tabs__btn {
+  flex: 1;
+  height: 100%;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--pa-font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.pa-tabs__btn--active { background: var(--pa-primary-700); }
+.pa-tabs__btn:hover:not(.pa-tabs__btn--active) { background: rgba(255,255,255,0.06); }
+
+/* Switcher — segmented pill inside a grey track. Two variants:
+   --blue (default) for choices that change data or selection;
+   --white for passive view toggles (how something is displayed). */
+.pa-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--pa-band);
+  border-radius: 999px;
+  width: fit-content;
+  justify-self: start;
+  align-self: start;
+  isolation: isolate;
+}
+.pa-switcher__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  height: 30px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-family: var(--pa-font-display);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pa-ink-4);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms cubic-bezier(.4,0,.2,1), color 150ms cubic-bezier(.4,0,.2,1);
+}
+.pa-switcher__btn:hover:not(.pa-switcher__btn--active) { background: rgba(33,33,33,0.05); color: var(--pa-ink-2); }
+.pa-switcher__btn:focus-visible { outline: 2px solid var(--pa-ink); outline-offset: 1px; }
+.pa-switcher__btn[disabled] { opacity: 0.35; pointer-events: none; }
+.pa-switcher--sm { padding: 2px; }
+.pa-switcher--sm .pa-switcher__btn { height: 26px; padding: 0 14px; font-size: 10.8px; }
+/* Blue: active state is a solid primary pill. */
+.pa-switcher--blue .pa-switcher__btn--active { background: var(--pa-primary); color: #fff; }
+.pa-switcher--blue .pa-switcher__btn--active:hover { background: var(--pa-primary-700); }
+/* White: active state is a raised white pill on the grey track. */
+.pa-switcher--white .pa-switcher__btn--active {
+  background: #fff;
+  color: var(--pa-ink);
+  box-shadow: var(--pa-elev-2);
+}
+
+/* Breadcrumb — sits below the tab bar, never above. */
+.pa-crumb { font-family: var(--pa-font-sans); font-size: 13px; line-height: 18px; color: var(--pa-ink-3); }
+.pa-crumb a { color: var(--pa-primary); }
+
+/* Modal scrim */
+.scrim { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+
+/* ============================================================
+   PrimeAdmin 3 design system — Vuetify input implementations
+   ============================================================ */
+/* ============================================================
+   Shared Vuetify-style input base — underlined variant.
+   Used by fields-*.html cards (text field, textarea, combobox,
+   radio, checkbox). The active accent is #000 per brand spec.
+   ============================================================ */
+
+.vf {
+  position: relative;
+  padding-top: 18px;
+  font-family: var(--pa-font-sans);
+  color: var(--pa-ink);
+}
+
+.vf__input,
+.vf__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  padding: 4px 0 6px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pa-ink);
+  outline: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+  transition: border-color 200ms cubic-bezier(.4, 0, .2, 1);
+}
+.vf__textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+.vf__input::placeholder,
+.vf__textarea::placeholder { color: rgba(0, 0, 0, 0.38); }
+.vf__input:placeholder-shown:not(:focus)::placeholder,
+.vf__textarea:placeholder-shown:not(:focus)::placeholder { color: transparent; }
+
+.vf__label {
+  position: absolute;
+  left: 0;
+  top: 18px;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  transform-origin: top left;
+  transition: transform 200ms cubic-bezier(.4, 0, .2, 1),
+              color 200ms cubic-bezier(.4, 0, .2, 1);
+}
+.vf__input:focus ~ .vf__label,
+.vf__input:not(:placeholder-shown) ~ .vf__label,
+.vf__textarea:focus ~ .vf__label,
+.vf__textarea:not(:placeholder-shown) ~ .vf__label {
+  transform: translateY(-18px) scale(0.857);
+}
+.vf__input:focus,
+.vf__textarea:focus,
+.vf--focused .vf__input,
+.vf--focused .vf__textarea {
+  border-bottom: 2px solid #000;
+  padding-bottom: 5px;
+  caret-color: #000;
+}
+.vf__input:focus ~ .vf__label,
+.vf__textarea:focus ~ .vf__label,
+.vf--focused .vf__label {
+  transform: translateY(-18px) scale(0.857);
+  color: #000;
+}
+
+.vf__messages {
+  min-height: 14px;
+  padding: 4px 0 0;
+  font-size: 12px;
+  line-height: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+.vf__counter { float: right; font-size: 12px; color: rgba(0, 0, 0, 0.6); padding-top: 4px; }
+
+/* Error */
+.vf--error .vf__input,
+.vf--error .vf__textarea,
+.vf--error .vf__input:focus,
+.vf--error .vf__textarea:focus { border-bottom-color: var(--pa-error); }
+.vf--error .vf__label,
+.vf--error .vf__input:focus ~ .vf__label,
+.vf--error .vf__textarea:focus ~ .vf__label { color: var(--pa-error); }
+.vf--error .vf__messages { color: var(--pa-error); }
+
+/* Disabled */
+.vf--disabled .vf__input,
+.vf--disabled .vf__textarea {
+  color: rgba(0, 0, 0, 0.38);
+  border-bottom-style: dotted;
+  border-bottom-color: rgba(0, 0, 0, 0.38);
+  pointer-events: none;
+}
+.vf--disabled .vf__label { color: rgba(0, 0, 0, 0.38); }
+
+/* Trailing icon (eye, dropdown chevron, etc.)
+   Sits at the input baseline, clear of the underline. */
+.vf__input--with-icon,
+.vf__textarea--with-icon { padding-right: 28px; }
+.vf__icon {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.vf__icon:hover { color: #000; }
+
+/* ============================================================
+   Selection controls — radio + checkbox
+   ============================================================ */
+
+.vsel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-family: var(--pa-font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pa-ink);
+  cursor: pointer;
+  user-select: none;
+}
+.vsel input { position: absolute; opacity: 0; pointer-events: none; }
+.vsel__box {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.6);
+  transition: color 150ms cubic-bezier(.4, 0, .2, 1);
+}
+.vsel__box i { font-size: 20px; }
+.vsel:hover .vsel__box { color: #000; }
+.vsel input:checked + .vsel__box { color: #000; }
+.vsel input:disabled ~ .vsel__box,
+.vsel--disabled .vsel__box { color: rgba(0, 0, 0, 0.26) !important; }
+.vsel--disabled,
+.vsel input:disabled ~ .vsel__label { color: rgba(0, 0, 0, 0.38); pointer-events: none; }
+
+/* Radio / checkbox groups */
+.vgroup { display: flex; gap: 4px 24px; flex-wrap: wrap; }
+.vgroup--inline { flex-direction: row; align-items: center; }
+.vgroup--stacked { flex-direction: column; gap: 2px; }
+
+.vgroup__legend {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+
+/* ============================================================
+   Switch / Toggle — Vuetify v-switch default variant
+   Thin track with a larger thumb that protrudes above/below.
+   Off: grey track + white thumb.
+   On:  light-green tinted track + full success-green thumb.
+   ============================================================ */
+.vsw {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  font-family: var(--pa-font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pa-ink);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+.vsw input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  inset: 0;
+}
+.vsw__track {
+  position: relative;
+  width: 36px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.38);
+  border-radius: 7px;
+  flex-shrink: 0;
+  transition: background 200ms cubic-bezier(.4, 0, .2, 1);
+}
+.vsw__thumb {
+  position: absolute;
+  top: -3px;          /* protrudes above the track */
+  left: -1px;         /* protrudes slightly past the track at rest */
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,0.2),
+              0 1px 1px 0 rgba(0,0,0,0.14),
+              0 1px 3px 0 rgba(0,0,0,0.12);
+  transition: transform 200ms cubic-bezier(.4, 0, .2, 1),
+              background 200ms cubic-bezier(.4, 0, .2, 1);
+}
+.vsw input:checked + .vsw__track { background: rgba(46, 125, 50, 0.5); }
+.vsw input:checked + .vsw__track .vsw__thumb {
+  transform: translateX(18px);
+  background: var(--pa-success);
+}
+.vsw:hover .vsw__track { background: rgba(0, 0, 0, 0.5); }
+.vsw:hover input:checked + .vsw__track { background: rgba(46, 125, 50, 0.6); }
+
+.vsw input:disabled + .vsw__track,
+.vsw--disabled .vsw__track { background: rgba(0, 0, 0, 0.18) !important; }
+.vsw input:disabled:checked + .vsw__track,
+.vsw--disabled input:checked + .vsw__track { background: rgba(46, 125, 50, 0.28) !important; }
+.vsw input:disabled:checked + .vsw__track .vsw__thumb,
+.vsw--disabled input:checked + .vsw__track .vsw__thumb { background: rgba(46, 125, 50, 0.6) !important; }
+.vsw input:disabled ~ .vsw__label,
+.vsw--disabled { color: rgba(0, 0, 0, 0.38); pointer-events: none; }
+
+
+/* ============================================================
+   Page shell
+   ============================================================ */
+html, body { margin: 0; background: #fff; }
+a { color: var(--pa-primary); text-decoration: none; }
+a:hover { color: var(--pa-primary-700); text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- data ---------------- */
+
+  var USERS = [
+    { id: 430710, name: "Irmak Saklayici", email: "i.saklayici@primeinc.org", roles: ["legacy-admin"], lastActive: "Aug 28, 2026" },
+    { id: 351212, name: "Volodymyr Boiko", email: "v.boiko@primeinc.org", roles: ["legacy-admin", "super admin"], lastActive: "Aug 31, 2026" },
+    { id: 349776, name: "Douglas Benjamin", email: "d.benjamin@primeinc.org", roles: ["faculty", "legacy-admin", "super admin"], lastActive: "Sep 1, 2026" },
+    { id: 317914, name: "Tester Permissions", email: "a.morek+pm@primeinc.org", roles: ["legacy-admin"], lastActive: "Jul 14, 2026" },
+    { id: 203474, name: "Mariia Turko", email: "mturko@everydayhealthgroup.com", roles: ["legacy-admin", "Outcomes"], lastActive: "Aug 26, 2026" },
+    { id: 182326, name: "Morgan Christ", email: "m.christ@primeinc.org", roles: ["admin", "legacy-admin", "Outcomes", "marketing"], lastActive: "Aug 29, 2026" },
+    { id: 178472, name: "Brian Michella", email: "b.michella@primeinc.org", roles: ["admin", "legacy-admin", "super admin"], lastActive: "Aug 30, 2026" },
+    { id: 172906, name: "Kevin Dunahee", email: "k.dunahee@primeinc.org", roles: ["legacy-admin", "Outcomes", "Project Manager"], lastActive: "Aug 25, 2026" },
+    { id: 151542, name: "Lynda Chiarella", email: "l.chiarella@primeinc.org", roles: ["legacy-admin", "marketing", "super admin"], lastActive: "Aug 21, 2026" },
+    { id: 88242, name: "Lor Novello", email: "l.novello@primeinc.org", roles: ["legacy-admin", "Outcomes", "faculty", "marketing"], lastActive: "Aug 12, 2026" },
+    { id: 84120, name: "Priya Raman", email: "p.raman@primeinc.org", roles: ["faculty"], lastActive: "Aug 18, 2026" },
+    { id: 79004, name: "Andre Fontaine", email: "a.fontaine@primeinc.org", roles: ["admin", "Project Manager"], lastActive: "Aug 11, 2026" },
+    { id: 66318, name: "Sara Whitfield", email: "s.whitfield@primeinc.org", roles: ["marketing"], lastActive: "Jul 30, 2026" },
+    { id: 61277, name: "Daniel Okafor", email: "d.okafor@primeinc.org", roles: ["Outcomes", "legacy-admin"], lastActive: "Aug 4, 2026" },
+    { id: 54990, name: "Helen Vargas", email: "h.vargas@primeinc.org", roles: ["super admin"], lastActive: "Aug 27, 2026" },
+    { id: 41208, name: "Marcus Reid", email: "m.reid@primeinc.org", roles: ["faculty", "Outcomes"], lastActive: "Jun 22, 2026" }
+  ];
+
+  var ALL_ROLES = ["admin", "faculty", "legacy-admin", "marketing", "Outcomes", "Outcomes view", "Project Manager", "Reporting > Outcomes", "super admin", "Writer"];
+
+  var ROLES = [
+    { id: 2, name: "admin", description: "Access to all administrative functions.", userCount: 14 },
+    { id: 7, name: "faculty", description: "Faculty role \u2014 access to assigned activities and contracts.", userCount: 62 },
+    { id: 5, name: "legacy-admin", description: "Inherited access from the legacy console.", userCount: 138 },
+    { id: 4, name: "marketing", description: "Access to marketing features, notifications, and newsletters.", userCount: 21 },
+    { id: 6, name: "Outcomes", description: "Access to Outcomes and survey data.", userCount: 33 },
+    { id: 8, name: "Outcomes view", description: "Read-only access to Outcomes data.", userCount: 17 },
+    { id: 10, name: "Project Manager", description: "For project managers and meeting solutions users.", userCount: 26 },
+    { id: 13, name: "Reporting > Outcomes", description: "Access to the Outcomes section under Reporting.", userCount: 9 },
+    { id: 1, name: "super admin", description: "Complete access and control throughout the application.", userCount: 6 },
+    { id: 3, name: "Writer", description: "Writer role \u2014 drafts and edits content.", userCount: 11 }
+  ];
+
+  var ACTIONS = ["view", "edit", "delete", "create"];
+
+  var PERM_GROUPS = [
+    { group: "Outcomes", items: [
+      { name: "Data Analysis", actions: ["view", "delete"] },
+      { name: "Survey Creator", actions: ["view", "edit", "delete", "create"] }
+    ]},
+    { group: "User Manager", items: [
+      { name: "Users", actions: ["view", "edit", "delete", "create"] },
+      { name: "Roles", actions: ["view", "edit", "delete", "create"] }
+    ]},
+    { group: "Tools", items: [
+      { name: "Article Uploader", actions: ["view", "edit", "delete", "create"] },
+      { name: "SynopsiMedEd Feeds", actions: ["view", "edit"] }
+    ]},
+    { group: "Reporting", items: [
+      { name: "Marketing", actions: ["view"] },
+      { name: "Outcomes", actions: ["view"] },
+      { name: "Program Management", actions: ["view"] }
+    ]},
+    { group: "Program Management", items: [
+      { name: "Projects", actions: ["view"] },
+      { name: "Project Files", actions: ["view", "edit", "delete", "create"] }
+    ]},
+    { group: "Marketing", items: [
+      { name: "Notifications", actions: ["view", "edit", "create"] },
+      { name: "Newsletter", actions: ["view", "edit", "delete", "create"] }
+    ]},
+    { group: "Gift Card Center", items: [
+      { name: "Gift Card Center", actions: ["view", "edit", "delete", "create"] }
+    ]}
+  ];
+
+  var PERM_ENTITIES = [
+    { entity: "Notifications", ids: { view: 23, create: 24, delete: 26, edit: 43 } },
+    { entity: "Projects", ids: { view: 27, create: 28, delete: 30, edit: 44 } },
+    { entity: "DataAnalysis", ids: { view: 31, create: 32, delete: 34, edit: 45 } },
+    { entity: "User", ids: { view: 35, create: 36, delete: 38, edit: 50 } },
+    { entity: "Role", ids: { view: 39, create: 40, delete: 42, edit: 51 } },
+    { entity: "Survey", ids: { view: 46, create: 47, edit: 48, delete: 49 } },
+    { entity: "Outcome", ids: { view: 60, create: 61, edit: 62, delete: 63 } },
+    { entity: "Marketing", ids: { view: 64, create: 65, edit: 66, delete: 67 } },
+    { entity: "ArticleUploader", ids: { view: 68, create: 69, edit: 70, delete: 71 } },
+    { entity: "SynopsiMedEdFeeds", ids: { view: 72, create: 73, edit: 74, delete: 75 } },
+    { entity: "Newsletter", ids: { create: 81, edit: 82, delete: 83, view: 84 } },
+    { entity: "ProjectFile", ids: { view: 85, create: 86, edit: 87, delete: 88 } },
+    { entity: "ProgramManagement", ids: { view: 89, create: 90, edit: 91, delete: 92 } },
+    { entity: "GiftCardCenter", ids: { view: 93, create: 94, edit: 95, delete: 96 } }
+  ];
+
+  var PERMISSIONS = [];
+  PERM_ENTITIES.forEach(function (e) {
+    Object.keys(e.ids).forEach(function (a) {
+      PERMISSIONS.push({ id: e.ids[a], name: e.entity + " " + a, description: "" });
+    });
+  });
+  PERMISSIONS.sort(function (a, b) { return a.id - b.id; });
+
+  /* ---------------- state ---------------- */
+
+  var state = {
+    section: "users",
+    userView: "list", userQuery: "", userPage: 1, userPerPage: 10, userSort: "id", userDir: "desc",
+    userForm: { email: "", first: "", last: "", roles: [] }, removedUsers: [],
+    roleView: "list", roleQuery: "", rolePage: 1, rolePerPage: 10,
+    roleForm: { id: null, name: "", description: "", perms: {} }, removedRoles: [],
+    permView: "list", permQuery: "", permPage: 1, permPerPage: 25,
+    permForm: { id: null, name: "", description: "", touched: false }, removedPerms: [],
+    confirm: null
+  };
+
+  /* ---------------- helpers ---------------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function initials(name) {
+    return name.split(" ").map(function (p) { return p[0]; }).join("").slice(0, 2).toUpperCase();
+  }
+  function paginate(list, page, perPage) {
+    var count = Math.max(1, Math.ceil(list.length / perPage));
+    var p = Math.min(page, count);
+    var start = (p - 1) * perPage;
+    return { page: p, pageCount: count, start: start, rows: list.slice(start, start + perPage) };
+  }
+  function rangeLabel(total, start, perPage, noun) {
+    if (!total) return "0 " + noun;
+    return (start + 1) + "-" + Math.min(start + perPage, total) + " of " + total + " " + noun;
+  }
+  function pager(kind, page, pageCount) {
+    var html = '<div class="pa-pager">';
+    html += '<button title="Previous page" data-act="' + kind + '-prev"><i class="mdi mdi-chevron-left" style="font-size:20px;vertical-align:-4px"></i></button>';
+    for (var n = 1; n <= pageCount; n++) {
+      html += '<button data-act="' + kind + '-page" data-page="' + n + '"' + (n === page ? ' aria-current="page"' : "") + ">" + n + "</button>";
+    }
+    html += '<button title="Next page" data-act="' + kind + '-next"><i class="mdi mdi-chevron-right" style="font-size:20px;vertical-align:-4px"></i></button>';
+    return html + "</div>";
+  }
+  function perPageSelect(kind, value, options) {
+    var html = '<span style="display:flex;align-items:center;gap:10px">Rows per page: <select data-act="' + kind + '-perpage">';
+    options.forEach(function (o) { html += '<option' + (o === value ? " selected" : "") + ">" + o + "</option>"; });
+    return html + "</select></span>";
+  }
+  function searchBar(kind, value, placeholder) {
+    return '' +
+      '<div style="display:flex;align-items:center;gap:16px">' +
+        '<div class="search" style="flex:1;max-width:none;height:40px">' +
+          '<input id="' + kind + '-search" placeholder="' + placeholder + '" value="' + esc(value) + '" data-act="' + kind + '-query">' +
+          '<i class="mdi mdi-magnify" style="color:var(--pa-ink-6);font-size:20px"></i>' +
+        '</div>' +
+        '<button class="pa-btn pa-btn--secondary pa-btn--lg" style="flex-shrink:0"><span>Search</span></button>' +
+      '</div>';
+  }
+  function emptyRow(icon, text) {
+    return '<div style="padding:56px 0;text-align:center"><i class="mdi mdi-' + icon + '" style="font-size:40px;color:var(--pa-ink-6)"></i>' +
+      '<div class="pa-body-16" style="margin-top:10px;color:var(--pa-ink-2)">' + esc(text) + "</div></div>";
+  }
+  function pageHeader(title, actionsHtml, crumbHtml) {
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px">' +
+      "<div>" + (crumbHtml || "") + '<h1 class="pa-page-title" style="margin:' + (crumbHtml ? "6px 0 0" : "0") + '">' + esc(title) + "</h1></div>" +
+      '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">' + actionsHtml + "</div></div>";
+  }
+  function checkbox(act, key, checked, extra) {
+    return '<label class="vsel"' + (extra || "") + '>' +
+      '<input type="checkbox" data-act="' + act + '" data-key="' + esc(key) + '"' + (checked ? " checked" : "") + ">" +
+      '<span class="vsel__box"><i class="mdi ' + (checked ? "mdi-checkbox-marked" : "mdi-checkbox-blank-outline") + '"></i></span>';
+  }
+
+  /* ---------------- chrome ---------------- */
+
+  function sidebar() {
+    var groups = [
+      { icon: "account-box-outline", label: "Program Management" },
+      { icon: "chart-line", label: "Marketing" },
+      { icon: "view-dashboard", label: "Outcomes" },
+      { icon: "chart-box-outline", label: "Reporting" },
+      { icon: "tools", label: "Tools" }
+    ];
+    var html = '<nav class="sb" style="position:sticky;top:0;height:100vh;overflow:auto">' +
+      '<div class="sb__head"><img src="logo-rev.svg" alt="PRIME ADMIN" style="height:22px;width:auto"><i class="mdi mdi-chevron-left sb__collapse"></i></div>';
+    groups.forEach(function (g) {
+      html += '<div class="sb__section"><div class="sb__item"><i class="mdi mdi-' + g.icon + '"></i><span>' + g.label + '</span><i class="mdi mdi-chevron-down sb__item__chev"></i></div></div>';
+    });
+    html += '<div class="sb__section"><div class="sb__item sb__item--active"><i class="mdi mdi-account-key"></i><span>User Manager</span><i class="mdi mdi-chevron-up sb__item__chev"></i></div><div class="sb__sub">';
+    [["users", "Users"], ["roles", "Roles"], ["permissions", "Permissions"]].forEach(function (s) {
+      html += '<div class="sb__sub-item' + (state.section === s[0] ? " sb__sub-item--active" : "") + '" data-act="section" data-section="' + s[0] + '">' + s[1] + "</div>";
+    });
+    return html + "</div></div></nav>";
+  }
+
+  function topbar() {
+    return '<header class="topbar" style="position:sticky;top:0;z-index:5">' +
+      '<div class="search" style="flex:1;max-width:520px;height:40px"><input placeholder="Search for [Project]"><i class="mdi mdi-magnify" style="color:var(--pa-ink-6);font-size:18px"></i></div>' +
+      '<button class="pa-btn pa-btn--primary"><i class="mdi mdi-plus"></i><span>Create</span></button>' +
+      '<div style="flex:1"></div>' +
+      '<button class="topbar__btn" title="Notifications" style="position:relative"><i class="mdi mdi-bell-outline" style="font-size:22px;color:var(--pa-ink-3)"></i>' +
+      '<span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--pa-error);color:#fff;font-size:10px;line-height:16px;font-weight:500;padding:0 4px">2</span></button>' +
+      '<span class="avatar" title="Douglas Benjamin">DB</span></header>';
+  }
+
+  /* ---------------- users ---------------- */
+
+  function usersList() {
+    var q = state.userQuery.trim().toLowerCase();
+    var list = USERS.filter(function (u) { return state.removedUsers.indexOf(u.id) < 0; })
+      .filter(function (u) {
+        return !q || u.name.toLowerCase().indexOf(q) >= 0 || u.email.toLowerCase().indexOf(q) >= 0 || String(u.id).indexOf(q) >= 0;
+      })
+      .sort(function (a, b) {
+        var v = state.userSort === "name" ? a.name.localeCompare(b.name) : a.id - b.id;
+        return state.userDir === "asc" ? v : -v;
+      });
+    var pg = paginate(list, state.userPage, state.userPerPage);
+    var label = rangeLabel(list.length, pg.start, state.userPerPage, "users");
+    var sortIcon = function (key) { return state.userSort === key ? (state.userDir === "asc" ? " \u2191" : " \u2193") : ""; };
+
+    var rows = pg.rows.map(function (u) {
+      var shown = u.roles.slice(0, 3);
+      var more = u.roles.length - shown.length;
+      var badges = shown.map(function (r) { return '<span class="pa-badge pa-badge--tint">' + esc(r) + "</span>"; }).join("");
+      if (more > 0) badges += '<span class="pa-badge pa-badge--tint" style="background:rgba(33,33,33,.06);color:var(--pa-ink-3)">+' + more + " more</span>";
+      return "<tr>" +
+        '<td class="num" style="vertical-align:middle">' + u.id + "</td>" +
+        '<td style="vertical-align:middle"><div style="display:flex;align-items:center;gap:12px">' +
+          '<span class="pa-avatar" style="width:30px;height:30px;font-size:11px;flex-shrink:0">' + initials(u.name) + "</span>" +
+          '<a href="#" data-act="user-edit" data-id="' + u.id + '">' + esc(u.name) + "</a></div></td>" +
+        '<td style="vertical-align:middle;color:var(--pa-ink-2)">' + esc(u.email) + "</td>" +
+        '<td style="vertical-align:middle"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + badges + "</div></td>" +
+        '<td class="num" style="vertical-align:middle">' + u.lastActive + "</td>" +
+        '<td class="acts" style="vertical-align:middle">' +
+          '<button class="pa-icon-btn pa-icon-btn--sm pa-icon-btn--primary" title="Resend invitation"><i class="mdi mdi-send-outline" style="font-size:17px"></i></button>' +
+          '<button class="pa-icon-btn pa-icon-btn--sm" title="Edit user" data-act="user-edit" data-id="' + u.id + '"><i class="mdi mdi-pencil" style="font-size:17px"></i></button>' +
+          '<button class="pa-icon-btn pa-icon-btn--sm pa-icon-btn--danger" title="Remove user" data-act="user-remove" data-id="' + u.id + '"><i class="mdi mdi-delete" style="font-size:17px"></i></button>' +
+        "</td></tr>";
+    }).join("");
+
+    return '<div style="display:flex;flex-direction:column;gap:20px">' +
+      pageHeader("Users", '<button class="pa-btn pa-btn--primary" data-act="user-create"><i class="mdi mdi-plus"></i><span>Add User</span></button>') +
+      searchBar("user", state.userQuery, "Search name, email, or ID") +
+      '<div style="min-width:0;overflow-x:auto">' +
+        '<div class="pa-tablebar"><span>' + label + "</span>" + perPageSelect("user", state.userPerPage, [10, 25, 50]) + pager("user", pg.page, pg.pageCount) + "</div>" +
+        '<table class="pa-ltable"><thead><tr>' +
+          '<th class="sortable" style="width:96px" data-act="user-sort" data-key="id">ID' + sortIcon("id") + "</th>" +
+          '<th class="sortable" style="min-width:180px" data-act="user-sort" data-key="name">Name' + sortIcon("name") + "</th>" +
+          '<th style="min-width:220px">Email</th><th style="min-width:240px">Role(s)</th>' +
+          '<th style="width:120px">Last Active</th><th class="acts" style="width:140px">Actions</th>' +
+        "</tr></thead><tbody>" + rows + "</tbody></table>" +
+        (list.length ? "" : emptyRow("account-search-outline", "No users match this search.")) +
+        '<div class="pa-tablebar pa-tablebar--footer"><span>' + label + "</span>" + pager("user", pg.page, pg.pageCount) + "</div>" +
+      "</div></div>";
+  }
+
+  function usersForm() {
+    var f = state.userForm;
+    var isEdit = state.userView === "edit";
+    var roles = ALL_ROLES.map(function (r) {
+      var checked = f.roles.indexOf(r) >= 0;
+      var locked = r === "legacy-admin";
+      return '<label class="vsel' + (locked ? " vsel--disabled" : "") + '">' +
+        '<input type="checkbox" data-act="user-role" data-key="' + esc(r) + '"' + (checked ? " checked" : "") + (locked ? " disabled" : "") + ">" +
+        '<span class="vsel__box"><i class="mdi ' + (checked ? "mdi-checkbox-marked" : "mdi-checkbox-blank-outline") + '"></i></span>' +
+        '<span class="vsel__label">' + esc(r) + "</span></label>";
+    }).join("");
+
+    var crumb = '<div class="pa-crumb"><a href="#" data-act="user-list">Users</a> &gt; ' + esc(isEdit ? ((f.first + " " + f.last).trim() || "User") : "New user") + "</div>";
+
+    return '<div style="display:flex;flex-direction:column;gap:24px;max-width:1080px">' +
+      pageHeader(isEdit ? "Edit User" : "Add User",
+        '<button class="pa-btn pa-btn--secondary-grey" data-act="user-list"><span>Cancel</span></button>' +
+        '<button class="pa-btn pa-btn--primary" data-act="user-list"><span>Save</span></button>', crumb) +
+      '<div class="pa-card pa-card--form">' +
+        '<div class="pa-band">Account</div>' +
+        '<div class="pa-card__body">' +
+          '<div class="pa-field' + (f.email ? " pa-field--filled" : "") + '"><label class="pa-field__label">Email</label>' +
+            '<input id="uf-email" class="pa-field__input" value="' + esc(f.email) + '" data-act="user-field" data-key="email">' +
+            '<div class="pa-field__hint">Used as the sign-in address and for all system notifications.</div></div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px 40px">' +
+            '<div class="pa-field' + (f.first ? " pa-field--filled" : "") + '"><label class="pa-field__label">First Name</label>' +
+              '<input id="uf-first" class="pa-field__input" value="' + esc(f.first) + '" data-act="user-field" data-key="first"></div>' +
+            '<div class="pa-field' + (f.last ? " pa-field--filled" : "") + '"><label class="pa-field__label">Last Name</label>' +
+              '<input id="uf-last" class="pa-field__input" value="' + esc(f.last) + '" data-act="user-field" data-key="last"></div>' +
+          "</div></div>" +
+        '<div class="pa-band">Roles</div>' +
+        '<div class="pa-card__body" style="gap:16px">' +
+          '<div class="pa-helper" style="margin:0">Roles grant access across the console. A user keeps every permission of every role selected.</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 24px">' + roles + "</div>" +
+          '<div class="pa-helper" style="margin:0">legacy-admin is inherited from the legacy console and cannot be removed here.</div>' +
+        "</div></div></div>";
+  }
+
+  /* ---------------- roles ---------------- */
+
+  function rolesList() {
+    var q = state.roleQuery.trim().toLowerCase();
+    var list = ROLES.filter(function (r) { return state.removedRoles.indexOf(r.id) < 0; })
+      .filter(function (r) { return !q || r.name.toLowerCase().indexOf(q) >= 0 || r.description.toLowerCase().indexOf(q) >= 0; });
+    var pg = paginate(list, state.rolePage, state.rolePerPage);
+    var label = rangeLabel(list.length, pg.start, state.rolePerPage, "roles");
+
+    var rows = pg.rows.map(function (r) {
+      return "<tr>" +
+        '<td class="num" style="vertical-align:middle">' + r.id + "</td>" +
+        '<td style="vertical-align:middle"><a href="#" data-act="role-edit" data-id="' + r.id + '">' + esc(r.name) + "</a></td>" +
+        '<td class="desc" style="vertical-align:middle">' + esc(r.description) + "</td>" +
+        '<td class="num" style="vertical-align:middle">' + r.userCount + "</td>" +
+        '<td class="acts" style="vertical-align:middle">' +
+          '<button class="pa-icon-btn pa-icon-btn--sm" title="Edit role" data-act="role-edit" data-id="' + r.id + '"><i class="mdi mdi-pencil" style="font-size:17px"></i></button>' +
+          '<button class="pa-icon-btn pa-icon-btn--sm pa-icon-btn--danger" title="Remove role" data-act="role-remove" data-id="' + r.id + '"><i class="mdi mdi-delete" style="font-size:17px"></i></button>' +
+        "</td></tr>";
+    }).join("");
+
+    return '<div style="display:flex;flex-direction:column;gap:20px">' +
+      pageHeader("Roles", '<button class="pa-btn pa-btn--primary" data-act="role-create"><i class="mdi mdi-plus"></i><span>Add Role</span></button>') +
+      searchBar("role", state.roleQuery, "Search Roles") +
+      '<div style="min-width:0;overflow-x:auto">' +
+        '<div class="pa-tablebar"><span>' + label + "</span>" + perPageSelect("role", state.rolePerPage, [10, 25, 50]) + pager("role", pg.page, pg.pageCount) + "</div>" +
+        '<table class="pa-ltable"><thead><tr><th style="width:80px">ID</th><th style="min-width:200px">Name</th>' +
+        '<th style="min-width:340px">Description</th><th style="width:120px">Users</th><th class="acts" style="width:110px">Actions</th></tr></thead>' +
+        "<tbody>" + rows + "</tbody></table>" +
+        (list.length ? "" : emptyRow("account-key-outline", "No roles match this search.")) +
+        '<div class="pa-tablebar pa-tablebar--footer"><span>' + label + "</span>" + pager("role", pg.page, pg.pageCount) + "</div>" +
+      "</div></div>";
+  }
+
+  function rolesForm() {
+    var f = state.roleForm;
+    var isEdit = state.roleView === "edit";
+    var body = "";
+    PERM_GROUPS.forEach(function (g) {
+      body += '<tr><td colspan="5" style="background:var(--pa-band);font-weight:500;vertical-align:middle">' + esc(g.group) + "</td></tr>";
+      g.items.forEach(function (it) {
+        body += '<tr><td style="padding-left:32px;vertical-align:middle">' + esc(it.name) + "</td>";
+        ACTIONS.forEach(function (a) {
+          var key = g.group + "/" + it.name + "/" + a;
+          body += '<td style="text-align:center;vertical-align:middle">';
+          if (it.actions.indexOf(a) >= 0) {
+            body += checkbox("role-perm", key, !!f.perms[key], ' style="justify-content:center"') + "</label>";
+          } else {
+            body += '<span style="color:var(--pa-ink-6)">\u2013</span>';
+          }
+          body += "</td>";
+        });
+        body += "</tr>";
+      });
+    });
+
+    var crumb = '<div class="pa-crumb"><a href="#" data-act="role-list">Roles</a> &gt; ' + esc(isEdit ? (f.name || "Role") : "New role") + "</div>";
+
+    return '<div style="display:flex;flex-direction:column;gap:24px">' +
+      pageHeader(isEdit ? "Edit Role" : "Create Role",
+        '<button class="pa-btn pa-btn--secondary-grey" data-act="role-list"><span>Cancel</span></button>' +
+        '<button class="pa-btn pa-btn--primary" data-act="role-list"><span>Save</span></button>', crumb) +
+      '<div class="pa-card pa-card--form">' +
+        '<div class="pa-band">Role</div>' +
+        '<div class="pa-card__body"><div style="display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:24px 40px">' +
+          '<div class="pa-field' + (f.name ? " pa-field--filled" : "") + '"><label class="pa-field__label">Name</label>' +
+            '<input id="rf-name" class="pa-field__input" value="' + esc(f.name) + '" data-act="role-field" data-key="name"></div>' +
+          '<div class="pa-field' + (f.description ? " pa-field--filled" : "") + '"><label class="pa-field__label">Description</label>' +
+            '<input id="rf-desc" class="pa-field__input" value="' + esc(f.description) + '" data-act="role-field" data-key="description">' +
+            '<div class="pa-field__hint">Shown on the roles list and when assigning the role to a user.</div></div>' +
+        "</div></div>" +
+        '<div class="pa-band">Permissions</div>' +
+        '<div class="pa-card__body" style="gap:14px;padding-top:20px">' +
+          '<div class="pa-helper" style="margin:0">A role needs at least one permission. A dash means the action does not apply to that area.</div>' +
+          '<div style="min-width:0;overflow-x:auto"><table class="pa-ltable"><thead><tr><th style="min-width:280px">Permission Name</th>' +
+            '<th style="width:96px;text-align:center">View</th><th style="width:96px;text-align:center">Edit</th>' +
+            '<th style="width:96px;text-align:center">Delete</th><th style="width:96px;text-align:center">Create</th></tr></thead>' +
+            "<tbody>" + body + "</tbody></table></div>" +
+        "</div></div></div>";
+  }
+
+  /* ---------------- permissions ---------------- */
+
+  function permsList() {
+    var q = state.permQuery.trim().toLowerCase();
+    var list = PERMISSIONS.filter(function (p) { return state.removedPerms.indexOf(p.id) < 0; })
+      .filter(function (p) { return !q || p.name.toLowerCase().indexOf(q) >= 0 || String(p.id).indexOf(q) >= 0; });
+    var pg = paginate(list, state.permPage, state.permPerPage);
+    var label = rangeLabel(list.length, pg.start, state.permPerPage, "permissions");
+
+    var rows = pg.rows.map(function (p) {
+      return "<tr>" +
+        '<td class="num" style="vertical-align:middle">' + p.id + "</td>" +
+        '<td style="vertical-align:middle"><a href="#" data-act="perm-edit" data-id="' + p.id + '">' + esc(p.name) + "</a></td>" +
+        '<td class="desc" style="vertical-align:middle">' + esc(p.description || "\u2014") + "</td>" +
+        '<td class="acts" style="vertical-align:middle">' +
+          '<button class="pa-icon-btn pa-icon-btn--sm" title="Edit permission" data-act="perm-edit" data-id="' + p.id + '"><i class="mdi mdi-pencil" style="font-size:17px"></i></button>' +
+          '<button class="pa-icon-btn pa-icon-btn--sm pa-icon-btn--danger" title="Remove permission" data-act="perm-remove" data-id="' + p.id + '"><i class="mdi mdi-delete" style="font-size:17px"></i></button>' +
+        "</td></tr>";
+    }).join("");
+
+    return '<div style="display:flex;flex-direction:column;gap:20px">' +
+      pageHeader("Permissions", '<button class="pa-btn pa-btn--primary" data-act="perm-create"><i class="mdi mdi-plus"></i><span>Add Permission</span></button>') +
+      searchBar("perm", state.permQuery, "Search Permissions") +
+      '<div style="min-width:0;overflow-x:auto">' +
+        '<div class="pa-tablebar"><span>' + label + "</span>" + perPageSelect("perm", state.permPerPage, [10, 25, 50]) + pager("perm", pg.page, pg.pageCount) + "</div>" +
+        '<table class="pa-ltable"><thead><tr><th style="width:80px">ID</th><th style="min-width:240px">Name</th>' +
+        '<th style="min-width:360px">Description</th><th class="acts" style="width:110px">Actions</th></tr></thead>' +
+        "<tbody>" + rows + "</tbody></table>" +
+        (list.length ? "" : emptyRow("lock-outline", "No permissions match this search.")) +
+        '<div class="pa-tablebar pa-tablebar--footer"><span>' + label + "</span>" + pager("perm", pg.page, pg.pageCount) + "</div>" +
+      "</div></div>";
+  }
+
+  function permsForm() {
+    var f = state.permForm;
+    var isEdit = state.permView === "edit";
+    var invalid = !isEdit && f.touched && !f.name.trim();
+    var nameField = isEdit
+      ? '<div class="pa-field pa-field--disabled pa-field--filled"><label class="pa-field__label">Name</label>' +
+        '<div class="pa-field__input" style="border-bottom-style:dashed">' + esc(f.name) + "</div>" +
+        '<div class="pa-field__hint">The machine name is fixed once a permission exists \u2014 roles reference it.</div></div>'
+      : '<div class="pa-field' + (invalid ? " pa-field--error" : "") + (f.name ? " pa-field--filled" : "") + '"><label class="pa-field__label">Name</label>' +
+        '<input id="pf-name" class="pa-field__input" value="' + esc(f.name) + '" data-act="perm-field" data-key="name">' +
+        '<div class="pa-field__hint">' + (invalid ? "Value is required." : "Machine name, e.g. Newsletter view. Used by the roles matrix.") + "</div></div>";
+
+    var crumb = '<div class="pa-crumb"><a href="#" data-act="perm-list">Permissions</a> &gt; ' + esc(isEdit ? (f.name || "Permission") : "New permission") + "</div>";
+
+    return '<div style="display:flex;flex-direction:column;gap:24px;max-width:1080px">' +
+      pageHeader(isEdit ? "Edit Permission" : "Create Permission",
+        '<button class="pa-btn pa-btn--secondary-grey" data-act="perm-list"><span>Cancel</span></button>' +
+        '<button class="pa-btn pa-btn--primary" data-act="perm-list"><span>Save</span></button>', crumb) +
+      '<div class="pa-card pa-card--form"><div class="pa-band">Permission</div><div class="pa-card__body">' +
+        nameField +
+        '<div class="pa-field' + (f.description ? " pa-field--filled" : "") + '"><label class="pa-field__label">Description</label>' +
+          '<input id="pf-desc" class="pa-field__input" value="' + esc(f.description) + '" data-act="perm-field" data-key="description">' +
+          '<div class="pa-field__hint">Explain what this permission unlocks \u2014 shown to admins assigning roles.</div></div>' +
+      "</div></div></div>";
+  }
+
+  /* ---------------- modal ---------------- */
+
+  function modal() {
+    var c = state.confirm;
+    if (!c) return "";
+    var title = c.kind === "role" ? "Remove role?" : c.kind === "permission" ? "Remove permission?" : "Remove user?";
+    var body = c.kind === "role"
+      ? c.item.name + " will be removed from " + c.item.userCount + " users. This cannot be undone."
+      : c.kind === "permission"
+        ? c.item.name + " will be removed from every role that grants it. This cannot be undone."
+        : c.item.name + " (" + c.item.email + ") will lose access to the console immediately. This cannot be undone.";
+    return '<div data-act="confirm-close" style="position:fixed;inset:0;background:rgba(33,33,33,0.46);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px">' +
+      '<div data-stop="1" style="width:440px;max-width:100%;background:#fff;border-radius:8px;box-shadow:var(--pa-elev-modal);overflow:hidden">' +
+        '<div class="pa-modal-title" style="padding:24px 26px 8px;text-transform:none;font-size:18px">' + title + "</div>" +
+        '<div class="pa-body-13" style="padding:0 26px 22px;color:var(--pa-ink-2)">' + esc(body) + "</div>" +
+        '<div style="border-top:1px solid var(--pa-divider);padding:14px 26px;display:flex;justify-content:flex-end;gap:12px">' +
+          '<button class="pa-btn pa-btn--secondary-grey" data-act="confirm-close"><span>Cancel</span></button>' +
+          '<button class="pa-btn pa-btn--danger" data-act="confirm-remove"><span>Remove</span></button>' +
+        "</div></div></div>";
+  }
+
+  /* ---------------- render ---------------- */
+
+  function content() {
+    if (state.section === "users") return state.userView === "list" ? usersList() : usersForm();
+    if (state.section === "roles") return state.roleView === "list" ? rolesList() : rolesForm();
+    return state.permView === "list" ? permsList() : permsForm();
+  }
+
+  function render() {
+    var active = document.activeElement;
+    var focusId = active && active.id ? active.id : null;
+    var caret = focusId && active.setSelectionRange ? active.selectionStart : null;
+
+    document.getElementById("app").innerHTML =
+      '<div style="display:flex;min-height:100vh;background:#fff;font-family:var(--pa-font-sans)">' +
+        sidebar() +
+        '<div style="flex:1;min-width:0;display:flex;flex-direction:column">' +
+          topbar() +
+          '<main style="flex:1;padding:24px 32px 32px;display:flex;flex-direction:column;gap:20px">' + content() + "</main>" +
+          modal() +
+          '<footer style="margin-top:auto;text-align:center;padding:22px;font-family:var(--pa-font-sans);font-size:13px;font-weight:700;color:var(--pa-ink);border-top:1px solid var(--pa-divider);background:#fff">1997-2026 PRIME Education, LLC</footer>' +
+        "</div></div>";
+
+    if (focusId) {
+      var el = document.getElementById(focusId);
+      if (el) {
+        el.focus();
+        if (caret != null && el.setSelectionRange) el.setSelectionRange(caret, caret);
+      }
+    }
+  }
+
+  /* ---------------- events ---------------- */
+
+  function byId(list, id) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  document.addEventListener("click", function (e) {
+    var stop = e.target.closest("[data-stop]");
+    var el = e.target.closest("[data-act]");
+    if (!el) return;
+    var act = el.getAttribute("data-act");
+    if (act === "confirm-close" && stop && !el.classList.contains("pa-btn")) return;
+    var id = parseInt(el.getAttribute("data-id"), 10);
+    if (el.tagName === "A") e.preventDefault();
+
+    switch (act) {
+      case "section":
+        state.section = el.getAttribute("data-section");
+        state.userView = state.roleView = state.permView = "list";
+        state.confirm = null;
+        break;
+
+      case "user-create":
+        state.userView = "create";
+        state.userForm = { email: "", first: "", last: "", roles: ["legacy-admin"] };
+        break;
+      case "user-edit": {
+        var u = byId(USERS, id);
+        var parts = u.name.split(" ");
+        state.userView = "edit";
+        state.userForm = { email: u.email, first: parts[0], last: parts.slice(1).join(" "), roles: u.roles.slice() };
+        break;
+      }
+      case "user-list": state.userView = "list"; break;
+      case "user-remove": state.confirm = { kind: "user", item: byId(USERS, id) }; break;
+      case "user-sort": {
+        var key = el.getAttribute("data-key");
+        state.userDir = state.userSort === key && state.userDir === "desc" ? "asc" : "desc";
+        state.userSort = key;
+        state.userPage = 1;
+        break;
+      }
+      case "user-prev": state.userPage = Math.max(1, state.userPage - 1); break;
+      case "user-next": state.userPage = state.userPage + 1; break;
+      case "user-page": state.userPage = parseInt(el.getAttribute("data-page"), 10); break;
+
+      case "role-create":
+        state.roleView = "create";
+        state.roleForm = { id: null, name: "", description: "", perms: {} };
+        break;
+      case "role-edit": {
+        var r = byId(ROLES, id);
+        var perms = {};
+        if (r.name === "super admin" || r.name === "admin") {
+          PERM_GROUPS.forEach(function (g) {
+            g.items.forEach(function (it) {
+              it.actions.forEach(function (a) { perms[g.group + "/" + it.name + "/" + a] = true; });
+            });
+          });
+        }
+        state.roleView = "edit";
+        state.roleForm = { id: r.id, name: r.name, description: r.description, perms: perms };
+        break;
+      }
+      case "role-list": state.roleView = "list"; break;
+      case "role-remove": state.confirm = { kind: "role", item: byId(ROLES, id) }; break;
+      case "role-prev": state.rolePage = Math.max(1, state.rolePage - 1); break;
+      case "role-next": state.rolePage = state.rolePage + 1; break;
+      case "role-page": state.rolePage = parseInt(el.getAttribute("data-page"), 10); break;
+
+      case "perm-create":
+        state.permView = "create";
+        state.permForm = { id: null, name: "", description: "", touched: false };
+        break;
+      case "perm-edit": {
+        var p = byId(PERMISSIONS, id);
+        state.permView = "edit";
+        state.permForm = { id: p.id, name: p.name, description: p.description, touched: false };
+        break;
+      }
+      case "perm-list": state.permView = "list"; break;
+      case "perm-remove": state.confirm = { kind: "permission", item: byId(PERMISSIONS, id) }; break;
+      case "perm-prev": state.permPage = Math.max(1, state.permPage - 1); break;
+      case "perm-next": state.permPage = state.permPage + 1; break;
+      case "perm-page": state.permPage = parseInt(el.getAttribute("data-page"), 10); break;
+
+      case "confirm-close": state.confirm = null; break;
+      case "confirm-remove": {
+        var c = state.confirm;
+        if (c.kind === "role") state.removedRoles.push(c.item.id);
+        else if (c.kind === "permission") state.removedPerms.push(c.item.id);
+        else state.removedUsers.push(c.item.id);
+        state.confirm = null;
+        break;
+      }
+      default: return;
+    }
+    render();
+  });
+
+  document.addEventListener("change", function (e) {
+    var el = e.target.closest("[data-act]");
+    if (!el) return;
+    var act = el.getAttribute("data-act");
+    var key = el.getAttribute("data-key");
+
+    if (act === "user-role") {
+      var i = state.userForm.roles.indexOf(key);
+      if (i >= 0) state.userForm.roles.splice(i, 1); else state.userForm.roles.push(key);
+    } else if (act === "role-perm") {
+      state.roleForm.perms[key] = !state.roleForm.perms[key];
+    } else if (act === "user-perpage") {
+      state.userPerPage = parseInt(el.value, 10); state.userPage = 1;
+    } else if (act === "role-perpage") {
+      state.rolePerPage = parseInt(el.value, 10); state.rolePage = 1;
+    } else if (act === "perm-perpage") {
+      state.permPerPage = parseInt(el.value, 10); state.permPage = 1;
+    } else {
+      return;
+    }
+    render();
+  });
+
+  document.addEventListener("input", function (e) {
+    var el = e.target.closest("[data-act]");
+    if (!el) return;
+    var act = el.getAttribute("data-act");
+    var key = el.getAttribute("data-key");
+
+    if (act === "user-query") { state.userQuery = el.value; state.userPage = 1; }
+    else if (act === "role-query") { state.roleQuery = el.value; state.rolePage = 1; }
+    else if (act === "perm-query") { state.permQuery = el.value; state.permPage = 1; }
+    else if (act === "user-field") { state.userForm[key] = el.value; }
+    else if (act === "role-field") { state.roleForm[key] = el.value; }
+    else if (act === "perm-field") { state.permForm[key] = el.value; state.permForm.touched = true; }
+    else return;
+    render();
+  });
+
+  render();
+})();
+
+</script>
+</body>
+</html>
